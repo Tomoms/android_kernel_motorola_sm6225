@@ -151,6 +151,11 @@
 #define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
 #endif
 
+#if __GNUC__ >= 5
+/* Avoid reordering a top level statement */
+#define __noreorder    __attribute__((no_reorder))
+#endif
+
 /*
  * Turn individual warnings and errors on and off locally, depending
  * on version.
