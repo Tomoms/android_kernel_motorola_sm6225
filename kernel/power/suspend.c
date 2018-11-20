@@ -33,11 +33,16 @@
 #include <linux/compiler.h>
 #include <linux/moduleparam.h>
 #include <linux/wakeup_reason.h>
+#include <linux/soc/qcom/smem_state.h>
 
 #include "power.h"
 #ifdef CONFIG_SUSPEND_DEBUG
 #include "user_sysfs_private.h"
 #endif
+
+#define PROC_AWAKE_ID 12 /* 12th bit */
+#define AWAKE_BIT BIT(PROC_AWAKE_ID)
+extern struct qcom_smem_state *smem_state;
 
 const char * const pm_labels[] = {
 	[PM_SUSPEND_TO_IDLE] = "freeze",
@@ -653,7 +658,9 @@ int pm_suspend(suspend_state_t state)
 
 	pm_suspend_marker("entry");
 	pr_info("suspend entry (%s)\n", mem_sleep_labels[state]);
+	qcom_smem_state_update_bits(smem_state, AWAKE_BIT, 0);
 	error = enter_state(state);
+	qcom_smem_state_update_bits(smem_state, AWAKE_BIT, AWAKE_BIT);
 	if (error) {
 		suspend_stats.fail++;
 		dpm_save_failed_errno(error);
