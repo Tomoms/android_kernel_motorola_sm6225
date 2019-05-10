@@ -1874,10 +1874,10 @@ void quiet_vmstat(void)
 	if (system_state != SYSTEM_RUNNING)
 		return;
 
-	if (!delayed_work_pending(this_cpu_ptr(&vmstat_work)))
+	if (unlikely(!delayed_work_pending(this_cpu_ptr(&vmstat_work))))
 		return;
 
-	if (!need_update(smp_processor_id()))
+	if (likely(!need_update(smp_processor_id())))
 		return;
 
 	/*
