@@ -70,7 +70,6 @@ struct kgsl_sync_fence_cb {
 
 struct kgsl_device_private;
 struct kgsl_drawobj_sync_event;
-struct event_fence_info;
 struct kgsl_process_private;
 struct kgsl_syncsource;
 
