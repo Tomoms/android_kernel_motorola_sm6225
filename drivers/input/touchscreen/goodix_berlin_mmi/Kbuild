@@ -21,3 +21,7 @@ goodix_brl_mmi-$(CONFIG_GTP_DDA_STYLUS) += goodix_ts_dda.o
 goodix_brl_mmi-$(CONFIG_INPUT_TOUCHSCREEN_MMI) += goodix_ts_mmi.o
 
 ccflags-$(CONFIG_INPUT_GOODIX_MMI_ENABLE_PALM) += -DGOODIX_PALM_SENSOR_EN
+
+ifneq ($(filter m y,$(CONFIG_INPUT_TOUCHSCREEN_MMI)),)
+    ccflags-y += -DCONFIG_INPUT_TOUCHSCREEN_MMI
+endif
