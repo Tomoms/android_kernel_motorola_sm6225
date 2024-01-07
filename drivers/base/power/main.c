@@ -434,14 +434,14 @@ static pm_callback_t pm_noirq_op(const struct dev_pm_ops *ops, pm_message_t stat
 
 	return NULL;
 }
-
+/*
 static void pm_dev_dbg(struct device *dev, pm_message_t state, const char *info)
 {
 	dev_info(dev, "%s%s%s\n", info, pm_verb(state.event),
 		((state.event & PM_EVENT_SLEEP) && device_may_wakeup(dev)) ?
 		", may wakeup" : "");
 }
-
+*/
 static void pm_dev_err(struct device *dev, pm_message_t state, const char *info,
 			int error)
 {
@@ -480,7 +480,7 @@ static int dpm_run_callback(pm_callback_t cb, struct device *dev,
 
 	calltime = initcall_debug_start(dev, cb);
 
-	pm_dev_dbg(dev, state, info);
+	//pm_dev_dbg(dev, state, info);
 	trace_device_pm_callback_start(dev, info, state.event);
 	error = cb(dev);
 	trace_device_pm_callback_end(dev, error);
@@ -1154,7 +1154,7 @@ static void device_complete(struct device *dev, pm_message_t state)
 	}
 
 	if (callback) {
-		pm_dev_dbg(dev, state, info);
+		//pm_dev_dbg(dev, state, info);
 		callback(dev);
 	}
 
@@ -1825,7 +1825,7 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
 			info = "bus ";
 			callback = pm_op(dev->bus->pm, state);
 		} else if (dev->bus->suspend) {
-			pm_dev_dbg(dev, state, "legacy bus ");
+			//pm_dev_dbg(dev, state, "legacy bus ");
 			error = legacy_suspend(dev, state, dev->bus->suspend,
 						"legacy bus ");
 			goto End;
