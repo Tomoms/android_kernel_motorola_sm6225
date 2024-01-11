@@ -23,13 +23,22 @@
 //#define PLATFORM_SPI
 //#define MTK_PLATFORM
 //#define LSI_PLATFORM
-#define EGIS_DEBUG
+//#define EGIS_DEBUG
 
+#ifdef EGIS_DEBUG
 #define DEBUG_PRINT(fmt, arg...) \
 	printk(KERN_DEBUG "[EGISFP]" fmt, ##arg)
 
 #define INFO_PRINT(fmt, arg...) \
 	printk("[EGISFP]" fmt, ##arg)
+#else
+#define DEBUG_PRINT(fmt, arg...) \
+	do {} while (0)
+
+#define INFO_PRINT(fmt, arg...) \
+	do {} while (0)
+#endif
+
 #define ERROR_PRINT(fmt, arg...) \
 	printk(KERN_ERR "[EGISFP]" fmt, ##arg)
 
