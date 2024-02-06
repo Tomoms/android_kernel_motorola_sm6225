@@ -26,9 +26,17 @@
 			bias-high-impedance;
 		};
 	};
+
+	indicator_led {
+		indicator_led_default: indicator_led_default {
+			pins = "gpio8";
+			function = "func1";
+			output-low;
+			power-source = <1>;
+		};
+	};
 };
 
-/*
 &soc {
 	indicator_led {
 		compatible = "qcom,indicator-pwm-led";
@@ -48,9 +56,19 @@
 		#address-cells = <1>;
 		qcom,pwms@b300 {
 			status = "ok";
-		};
-	};
-};*/
+      qcom,lut-patterns = <0 0 0 14 28 42 56 70 84 100
+      100 84 70 56 42 28 14 0 0 0>;
+        lpg@1 {
+           qcom,lpg-chan-id = <1>;
+           qcom,ramp-step-ms = <200>;
+           qcom,ramp-low-index = <0>;
+           qcom,ramp-high-index = <19>;
+           qcom,ramp-pattern-repeat;
+           qcom,lpg-sdam-base = <0x48>;
+        };
+     };
+  };
+};
 
 &qupv3_se0_i2c {
 	#address-cells = <1>;
