@@ -54,7 +54,6 @@
 #include <linux/shmem_fs.h>
 #include <linux/ctype.h>
 #include <linux/debugfs.h>
-#include <linux/simple_lmk.h>
 
 #include <asm/tlbflush.h>
 #include <asm/div64.h>
@@ -3960,9 +3959,6 @@ static void lru_gen_age_node(struct pglist_data *pgdat, struct scan_control *sc)
 	 * memcgs are either below min or empty.
 	 */
 	if (!success && !sc->order && mutex_trylock(&oom_lock)) {
-#ifdef CONFIG_ANDROID_SIMPLE_LMK
-		simple_lmk_trigger();
-#endif
 		struct oom_control oc = {
 			.gfp_mask = sc->gfp_mask,
 		};
