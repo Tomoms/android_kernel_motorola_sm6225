@@ -42,7 +42,6 @@
 #include "../clk/clk.h"
 #define CREATE_TRACE_POINTS
 #include <trace/events/trace_msm_low_power.h>
-#include <linux/tick.h>
 
 #define SCLK_HZ (32768)
 #define PSCI_POWER_STATE(reset) (reset << 30)
@@ -64,10 +63,6 @@ static void cluster_prepare(struct lpm_cluster *cluster,
 
 static bool print_parsed_dt;
 module_param_named(print_parsed_dt, print_parsed_dt, bool, 0664);
-
-
-static DEFINE_PER_CPU(struct hrtimer, wfi_timer);
-s64 teo_wfi_timeout_us(void);
 
 /**
  * msm_cpuidle_get_deep_idle_latency - Get deep idle latency value
@@ -663,32 +658,12 @@ static bool psci_enter_sleep(struct lpm_cpu *cpu, int idx, bool from_idle)
 {
 	int affinity_level = 0, state_id = 0, power_state = 0;
 	bool success = false;
-	s64 wfi_timeout_us = teo_wfi_timeout_us();
-	struct hrtimer *timer = NULL;
-
 	/*
 	 * idx = 0 is the default LPM state
 	 */
 
 	if (!idx) {
-		/*
-		 * If the tick is stopped, arm a timer to ensure that the CPU doesn't
-		 * stay in WFI too long and burn power. That way, the CPU will be woken
-		 * up so it can enter a deeper idle state instead of staying in WFI.
-		 */
-		if (wfi_timeout_us) {
-			/* Use TEO's estimated sleep duration with some slack added */
-			timer = this_cpu_ptr(&wfi_timer);
-			hrtimer_start(timer, ns_to_ktime(wfi_timeout_us * NSEC_PER_USEC),
-				      HRTIMER_MODE_REL_PINNED_HARD);
-		}
-
 		cpu_do_idle();
-
-		/* Cancel the timer if it was armed. This always succeeds. */
-		if (timer)
-			hrtimer_try_to_cancel(timer);
-
 		return true;
 	}
 
@@ -709,18 +684,6 @@ static bool psci_enter_sleep(struct lpm_cpu *cpu, int idx, bool from_idle)
 
 	return success;
 }
-
-static int __init wfi_timer_init(void)
-{
-	int cpu;
-
-	/* No function is needed; the timer is canceled while IRQs are off */
-	for_each_possible_cpu(cpu)
-		hrtimer_init(&per_cpu(wfi_timer, cpu), CLOCK_MONOTONIC,
-			     HRTIMER_MODE_REL_HARD);
-	return 0;
-}
-pure_initcall(wfi_timer_init);
 
 static int lpm_cpuidle_select(struct cpuidle_driver *drv,
 		struct cpuidle_device *dev, bool *stop_tick)
