@@ -12,7 +12,7 @@
 #define TRACE_INCLUDE_FILE kgsl_trace_power
 
 #include <linux/tracepoint.h>
-
+#if 0
 /**
  * gpu_frequency - Reports frequency changes in GPU clock domains
  * @state:  New frequency (in KHz)
@@ -34,7 +34,7 @@ TRACE_EVENT(gpu_frequency,
 		(unsigned long)__entry->state,
 		(unsigned long)__entry->gpu_id)
 );
-
+#endif
 #endif /* _KGSL_TRACE_POWER_H */
 
 /* This part must be outside protection */
