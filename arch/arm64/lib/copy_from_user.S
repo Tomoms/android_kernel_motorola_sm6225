@@ -81,4 +81,3 @@ USER(9998f, ldtrb tmp1w, [srcin])
 9998:	sub	x0, end, dst			// bytes not copied
 	ret
 SYM_FUNC_END(__arch_copy_from_user)
-EXPORT_SYMBOL(__arch_copy_from_user)
