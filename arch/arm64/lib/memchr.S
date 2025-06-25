@@ -42,4 +42,3 @@ SYM_FUNC_START_WEAK_PI(memchr)
 2:	mov	x0, #0
 	ret
 SYM_FUNC_END_PI(memchr)
-EXPORT_SYMBOL_NOKASAN(memchr)
