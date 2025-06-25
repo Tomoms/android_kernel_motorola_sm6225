@@ -74,7 +74,6 @@ SYM_FUNC_START(__arch_copy_in_user)
 	mov	x0, #0
 	ret
 SYM_FUNC_END(__arch_copy_in_user)
-EXPORT_SYMBOL(__arch_copy_in_user)
 
 	.section .fixup,"ax"
 	.align	2
