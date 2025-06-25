@@ -51,4 +51,3 @@ USER(7f, sttrb	wzr, [x2, #-1])
 9:	sub	x0, x2, x0
 	ret
 SYM_FUNC_END(__arch_clear_user)
-EXPORT_SYMBOL(__arch_clear_user)
