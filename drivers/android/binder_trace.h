@@ -388,8 +388,10 @@ TRACE_EVENT(binder_command,
 	),
 	TP_printk("cmd=0x%x %s",
 		  __entry->cmd,
+#ifdef CONFIG_ANDROID_BINDER_LOGS
 		  _IOC_NR(__entry->cmd) < ARRAY_SIZE(binder_command_strings) ?
 			  binder_command_strings[_IOC_NR(__entry->cmd)] :
+#endif
 			  "unknown")
 );
 
@@ -404,8 +406,10 @@ TRACE_EVENT(binder_return,
 	),
 	TP_printk("cmd=0x%x %s",
 		  __entry->cmd,
+#ifdef CONFIG_ANDROID_BINDER_LOGS
 		  _IOC_NR(__entry->cmd) < ARRAY_SIZE(binder_return_strings) ?
 			  binder_return_strings[_IOC_NR(__entry->cmd)] :
+#endif
 			  "unknown")
 );
 
