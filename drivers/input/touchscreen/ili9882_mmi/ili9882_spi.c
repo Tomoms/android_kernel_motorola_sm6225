@@ -613,6 +613,7 @@ static int ilitek_spi_probe(struct spi_device *spi)
 #ifndef CONFIG_INPUT_TOUCHSCREEN_MMI
 #ifdef ILI_FW_PANEL
 	int ret;
+    static int deferred_twice = 0;
 #endif
 #endif
 	ILI_INFO("ilitek spi probe\n");
@@ -629,15 +630,19 @@ static int ilitek_spi_probe(struct spi_device *spi)
 
 #ifdef ILI_FW_PANEL
 	ret = check_dt(dp);
-	if (ret) {
-		ILI_INFO("panel error\n");
-		return ret;
-	}
-#else
-	if ((tp_module = check_dt(dp)) < 0) {
-		ILI_ERR("%s: %s not actived\n", __func__, dp->name);
-		return -ENODEV;
-	}
+	if (ret && deferred_twice > 2) {
+        ILI_INFO("DRM panel not available yet, deferring probe.");
+        /* If the panel is not ready, defer the probe and let the kernel retry later. */
+        deferred_twice++;
+        return -EPROBE_DEFER;
+	} else if (deferred_twice >= 2) {
+        ILI_INFO("panel error\n");
+        if ((tp_module = check_dt(dp)) < 0) {
+            ILI_ERR("%s: %s not actived\n", __func__, dp->name);
+            return -ENODEV;
+        }
+        return ret;
+    }
 #endif
 }
 #endif

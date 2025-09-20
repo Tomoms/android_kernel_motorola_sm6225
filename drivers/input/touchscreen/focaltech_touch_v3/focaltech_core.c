@@ -2199,8 +2199,14 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 #ifndef CONFIG_INPUT_TOUCHSCREEN_MMI
 #if defined(CONFIG_DRM)
 #if defined(CONFIG_DRM_PANEL)
+        static int deferred_twice = 0;
         ret = drm_check_dt(ts_data->dev->of_node);
-        if (ret) {
+        if (ret && deferred_twice < 2) {
+            FTS_ERROR("DRM panel not ready yet, deferring probe.");
+            /* If the panel is not ready, defer the probe and let the kernel retry later. */
+            deferred_twice++;
+            return -EPROBE_DEFER;
+        } else if (deferred_twice >= 2) {
             FTS_ERROR("parse drm-panel fail");
         }
 #endif

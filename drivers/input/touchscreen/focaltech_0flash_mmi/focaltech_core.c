@@ -1803,6 +1803,7 @@ out:
     return ret;
 }
 
+
 int drm_notifier_callback(struct notifier_block *self, unsigned long event, void *data)
 {
 	struct drm_panel_notifier *evdata = data;
@@ -2033,6 +2034,7 @@ static int fts_charger_notifier_callback(struct notifier_block *nb,
 static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 {
     int ret = 0;
+    static int deferred_twice = 0;
     int pdata_size = sizeof(struct fts_ts_platform_data);
 #if FTS_CONFIG_DRM_PANEL
 	struct device_node *dp = ts_data->dev->of_node;
@@ -2051,14 +2053,17 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
         if (ret)
             FTS_ERROR("device-tree parse fail");
 #if FTS_CONFIG_DRM_PANEL
-	if (drm_check_dt(dp)) {
-		FTS_ERROR("parse drm-panel fail");
-		if (!fts_ts_check_default_tp(dp, "qcom,spi-touch-active"))
-			ret = -EPROBE_DEFER;
-		else
-			ret = -ENODEV;
-		return ret;
-	}
+	if (drm_check_dt(dp) && deferred_twice < 2) {
+		FTS_ERROR("DRM panel not available yet, deferring probe.");
+		/* If the panel is not ready, defer the probe and let the kernel retry later. */
+            deferred_twice++;
+		return -EPROBE_DEFER;
+	} else if (deferred_twice >= 2) {
+        	FTS_ERROR("parse drm-panel fail");
+        	if (!fts_ts_check_default_tp(dp, "qcom,spi-touch-active"))
+            		ret = -ENODEV;
+        	return ret;
+    	}
 #endif
     } else {
         if (ts_data->dev->platform_data) {

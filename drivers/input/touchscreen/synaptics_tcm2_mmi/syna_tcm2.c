@@ -1660,6 +1660,7 @@ static struct drm_panel *syna_dev_get_panel(struct device_node *np)
 static int syna_dev_probe(struct platform_device *pdev)
 {
 	int retval;
+    static int deferred_twice = 0;
 	struct syna_tcm *tcm = NULL;
 	struct tcm_dev *tcm_dev = NULL;
 	struct syna_hw_interface *hw_if = NULL;
@@ -1672,7 +1673,12 @@ static int syna_dev_probe(struct platform_device *pdev)
 #endif
 
 	hw_if = pdev->dev.platform_data;
-	if (!hw_if) {
+	if (!hw_if && deferred_twice < 2) {
+        LOGE("DRM panel not available yet, deferring probe.\n");
+        /* If the panel is not ready, defer the probe and let the kernel retry later. */
+        deferred_twice++;
+        return -EPROBE_DEFER;
+    } else if (deferred_twice >= 2) {
 		LOGE("Fail to find hardware configuration\n");
 		return -EINVAL;
 	}

@@ -2988,6 +2988,7 @@ return:
 static int32_t nvt_ts_probe(struct spi_device *client)
 {
 	int32_t ret = 0;
+    static int32_t deferred_twice = 0;
 #ifdef CONFIG_SPI_SM8450
 	struct spi_geni_qcom_ctrl_data *spi_param = NULL;
 #endif
@@ -3002,10 +3003,15 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	struct device_node *dp = client->dev.of_node;
 
 	ret = nova_check_dt(dp);
-	if (ret) {
-		NVT_LOG("panel error\n");
-		return ret;
-	}
+	if (ret && deferred_twice < 2) {
+		NVT_ERR("DRM panel not available yet, deferring probe.");
+		/* If the panel is not ready, defer the probe and let the kernel retry later. */
+        deferred_twice++;
+		return -EPROBE_DEFER;
+	} else if (deferred_twice >= 2) {
+        NVT_LOG("panel error");
+        return ret;
+    }
 #endif
 #else
 	if (client->dev.of_node && !mmi_device_is_available(client->dev.of_node)) {

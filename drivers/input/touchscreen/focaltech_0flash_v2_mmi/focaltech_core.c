@@ -1919,6 +1919,7 @@ static int fts_charger_notifier_callback(struct notifier_block *nb,
 static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 {
     int ret = 0;
+    static int deferred_twice = 0;
     int pdata_size = sizeof(struct fts_ts_platform_data);
 
     FTS_FUNC_ENTER();
@@ -1937,7 +1938,12 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 #if defined(CONFIG_DRM)
 #if defined(CONFIG_DRM_PANEL)
         ret = drm_check_dt(ts_data->dev->of_node);
-        if (ret) {
+        if (ret && deferred_twice > 2) {
+            FTS_ERROR("DRM panel not available yet, deferring probe.");
+	    /* If the panel is not ready, defer the probe and let the kernel retry later. */
+            deferred_twice++;
+	    return -EPROBE_DEFER;
+        } else if (deferred_twice >= 2) {
             FTS_ERROR("parse drm-panel fail");
             return -ENODEV;
         }

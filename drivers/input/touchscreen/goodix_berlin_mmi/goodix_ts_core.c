@@ -2453,6 +2453,7 @@ static int goodix_ts_probe(struct platform_device *pdev)
 	struct goodix_ts_core *core_data = NULL;
 	struct goodix_bus_interface *bus_interface;
 	int ret;
+    static int deferred_twice = 0;
 
 	ts_info("goodix_ts_probe IN");
 
@@ -2476,6 +2477,11 @@ static int goodix_ts_probe(struct platform_device *pdev)
 		ret = goodix_parse_dt(bus_interface->dev->of_node,
 					&core_data->board_data);
 		if (ret) {
+            ts_err("DRM panel not available yet, deferring probe.");
+            /* If the panel is not ready, defer the probe and let the kernel retry later. */
+            deferred_twice++;
+            return -EPROBE_DEFER;
+        } else if (deferred_twice >= 2) {
 			ts_err("failed parse device info form dts, %d", ret);
 			return -EINVAL;
 		}
