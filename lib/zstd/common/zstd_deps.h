@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ OR BSD-3-Clause */
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * Copyright (c) Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under both the BSD-style license (found in the
@@ -27,7 +27,7 @@
 #define ZSTD_DEPS_COMMON
 
 #include <linux/limits.h>
-#include <stddef.h>
+#include <linux/stddef.h>
 
 #define ZSTD_memcpy(d,s,n) __builtin_memcpy((d),(s),(n))
 #define ZSTD_memmove(d,s,n) __builtin_memmove((d),(s),(n))
@@ -115,7 +115,11 @@ static uint64_t ZSTD_div64(uint64_t dividend, uint32_t divisor) {
 #ifndef ZSTD_DEPS_STDINT
 #define ZSTD_DEPS_STDINT
 
-/* intptr_t already provided by ZSTD_DEPS_COMMON */
+/*
+ * The Linux Kernel doesn't provide intptr_t, only uintptr_t, which
+ * is an unsigned long.
+ */
+typedef long intptr_t;
 
 #endif /* ZSTD_DEPS_STDINT */
 #endif /* ZSTD_DEPS_NEED_STDINT */
