@@ -65,7 +65,6 @@
  */
 #define SCHED_FEAT_WARN_DOUBLE_CLOCK 0
 
-#ifdef HAVE_RT_PUSH_IPI
 /*
  * In order to avoid a thundering herd attack of CPUs that are
  * lowering their priorities at the same time, and there being
@@ -84,7 +83,6 @@
 # else
 #define SCHED_FEAT_RT_PUSH_IPI 0
 # endif
-#endif
 
 #define SCHED_FEAT_RT_RUNTIME_SHARE 0
 #define SCHED_FEAT_LB_MIN 0
